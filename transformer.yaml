@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "example-transformer"
+spec:
+  selector:
+    app: tf-image-transformer
+  ports:
+  - protocol: "TCP"
+    port: 6000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tf-image-transformer
+spec:
+  selector:
+    matchLabels:
+      app: tf-image-transformer
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: tf-image-transformer
+    spec:
+      containers:
+      - name: "tf-image-transformer"
+        image: chinhuang007/wml-transformer:latest 
+        ports:
+        - containerPort: 5000
