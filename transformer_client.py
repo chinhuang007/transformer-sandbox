@@ -9,16 +9,11 @@ trainX = trainX[..., tf.newaxis]
 trainy = trainy[..., tf.newaxis]
 idx=random.randint(0, len(trainX)-1)
 
-transformer_addr="169.44.151.84:6000"
-server_addr="169.62.82.164:8033"
+transformer_addr="hostname:port"
+server_addr="hostname:port"
+model_name="example-sklearn-mnist-svm"
 
-res = requests.post('http://'+transformer_addr, json={"instances": trainX[idx].tolist(), "server_addr": server_addr})
+res = requests.post('http://'+transformer_addr, 
+        json={"instances": trainX[idx].tolist(), "server_addr": server_addr, "model_name": model_name})
 print("Expected Result:", trainy[idx][0])
 print("Inference Output: ", res.json())
-
-'''
-for idx in range(20):
-  res = requests.post('http://'+transformer_addr, json={"instances": trainX[idx].tolist(), "server_addr": server_addr})
-  print("expected:", trainy[idx])
-  print(res.json())
-'''

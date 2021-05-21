@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def pre_process():
+    # expect input to have instances, server_addr, model_name
     input_data = flask.request.json
 
     # input transformation for model predict
@@ -20,8 +21,8 @@ def pre_process():
 
     # setup gRPC channel, client, and input
     server_addr = input_data['server_addr']
+    model_name = input_data['model_name']
     channel = grpc.insecure_channel(server_addr)
-    #channel = grpc.insecure_channel('169.62.82.164:8033')
     infer_client = pb_grpc.GRPCInferenceServiceStub(channel)
 
     tensor_contents = pb.InferTensorContents(fp32_contents=data[0])
@@ -32,9 +33,10 @@ def pre_process():
         datatype="FP32",
         contents=tensor_contents
     )
-    metadata = (('mm-vmodel-id','example-sklearn-mnist-svm'),)
+
+    metadata = (('mm-vmodel-id', model_name),)
     inputs = [infer_input]
-    request = pb.ModelInferRequest(model_name="example-sklearn-mnist-svm", inputs=inputs)
+    request = pb.ModelInferRequest(model_name=model_name, inputs=inputs)
 
     # send inference request
     results, call = infer_client.ModelInfer.with_call(request=request, metadata=metadata)
